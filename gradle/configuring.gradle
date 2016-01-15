@@ -1,0 +1,4 @@
+def env = project.hasProperty('env') ? project.getProperty('env') : 'test'
+
+def configFile = file("$rootDir/gradle/config.groovy")
+rootProject.ext.parsedConfig = new ConfigSlurper(env).parse(configFile.toURL())

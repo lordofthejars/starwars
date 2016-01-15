@@ -1,0 +1,46 @@
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
+ext.buildTimestamp = new Date().format('yyyy-MM-dd HH:mm:ss')
+
+Pattern SHORT_VERSION_PATTERN = ~/(\d+)\.(\d+)/
+Pattern WHITESPACE = ~/\s*/
+String SNAPSHOT_IDENTIFIER = '-SNAPSHOT'
+
+Pattern SNAPSHOT_SHORT_VERSION_PATTERN = ~/$WHITESPACE$SHORT_VERSION_PATTERN$SNAPSHOT_IDENTIFIER$WHITESPACE/
+
+Matcher m = checkInputAgainstPattern(version, SNAPSHOT_SHORT_VERSION_PATTERN)
+
+if (m) {
+    Integer major = m[0][1].toInteger()
+    Integer minor = m[0][2].toInteger()
+
+    version = new ProjectVersion(major, minor, System.env.SOURCE_BUILD_NUMBER)
+}
+
+class ProjectVersion {
+    Integer major
+    Integer minor
+    String buildNumber
+    ProjectVersion(Integer major, Integer minor, String buildNumber) {
+        this.major = major
+        this.minor = minor
+        this.buildNumber = buildNumber
+    }
+    @Override
+    String toString() {
+        String fullVersion = "$major.$minor"
+        if(buildNumber) {
+            fullVersion += ".$buildNumber"
+        }
+        fullVersion
+    }
+}
+
+private Matcher checkInputAgainstPattern(String input, Pattern pattern) {
+    if (!(input ==~ pattern)) {
+        return null
+    }
+
+    input =~ pattern
+}

@@ -36,8 +36,8 @@ public class SwapiGatewayTest {
         );
 
         SwapiGateway swapiGateway = new SwapiGateway();
-        swapiGateway.swapiUrl = "http://localhost:8089";
         swapiGateway.initializeClient();
+        swapiGateway.swapiUrl = "http://localhost:8089";
 
         final JsonObject allPlanets = swapiGateway.getAllPlanets();
         final JsonArray results = allPlanets.getJsonArray("results");

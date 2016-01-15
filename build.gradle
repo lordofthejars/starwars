@@ -1,7 +1,13 @@
 apply plugin: 'war'
+apply plugin: 'pmd'
+apply plugin: 'jacoco'
+apply plugin: 'maven-publish'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
+
+group = 'org.starwars'
+version = '1.0-SNAPSHOT'
 
 buildscript {
     repositories {
@@ -13,7 +19,6 @@ buildscript {
 }
 
 apply plugin: "io.spring.dependency-management"
-
 
 repositories {
     mavenCentral()
@@ -38,10 +43,78 @@ dependencies {
 
     testCompile group: 'org.jboss.arquillian.junit', name: 'arquillian-junit-container'
     testCompile 'org.apache.tomee:arquillian-tomee-remote:7.0.0-M1'
-    //testCompile 'org.apache.tomee:tomee-jaxrs:7.0.0-M1'
     testCompile 'com.jayway.restassured:rest-assured:2.8.0'
 }
 
-testSets {
-    integrationTests
+pmd {
+    ignoreFailures = true
+    ruleSets = [
+            "basic"
+    ]
+}
+
+jacoco {
+    toolVersion = "0.7.5.201505241946"
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+    }
+}
+
+apply from: "$rootDir/gradle/configuring.gradle"
+
+allprojects {
+    apply from: "$rootDir/gradle/versioning.gradle"
+    ext.config = rootProject.ext.parsedConfig
+}
+
+task createBuildInfoFile << {
+    def buildInfoFile = new File("$buildDir/build-info.properties")
+    Properties props = new Properties()
+    props.setProperty('version', project.version.toString())
+    props.setProperty('timestamp', project.buildTimestamp)
+    props.store(buildInfoFile.newWriter(), null)
+}
+
+war {
+    dependsOn createBuildInfoFile
+    from(buildDir) {
+        include 'build-info.properties'
+        into('WEB-INF/classes')
+    }
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
+
+task javadocJar (type: Jar, dependsOn: javadoc) {
+    from javadoc.destinationDir
+}
+
+ext.repoUrl = "$config.binaryRepository.url/$config.binaryRepository.name"
+
+publishing {
+    publications {
+        webApp(MavenPublication){
+            from components.web
+            artifact sourceJar {
+                classifier "sources"
+            }
+            artifact javadocJar {
+                classifier "javadoc"
+            }
+        }
+    }
+
+    // Local directory is used for simplification
+
+    repositories {
+        maven {
+            url repoUrl
+        }
+    }
 }
