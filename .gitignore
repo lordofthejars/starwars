@@ -1,0 +1,40 @@
+# Eclipse
+.project
+.classpath
+.settings/
+.factorypath
+dependency-reduced-pom.xml
+pom.xml.versionsBackup
+
+# IntelliJ
+*.iml
+*.ipr
+*.iws
+.idea
+bin/
+
+# Gradle
+.gradle/
+.ivy/
+build/
+
+# Maven
+target/
+
+# TestNG
+test-output/
+
+# JBoss AS
+transaction.log
+
+# Infinitest configuration
+infinitest.filters
+
+# Logs
+*.log
+*.log~
+
+# Libreoffice leftovers (XLS)
+.~lock*
+
+atlassian-ide-plugin.xml

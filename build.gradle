@@ -1,0 +1,47 @@
+apply plugin: 'war'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "io.spring.gradle:dependency-management-plugin:0.5.3.RELEASE"
+    }
+}
+
+apply plugin: "io.spring.dependency-management"
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencyManagement {
+    imports {
+        mavenBom 'org.jboss.arquillian:arquillian-bom:1.1.10.Final'
+    }
+}
+
+dependencies {
+    providedCompile 'javax:javaee-api:7.0'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.apache.cxf:cxf-rt-rs-client:3.1.4'
+    testCompile 'org.apache.johnzon:johnzon-jaxrs:0.9.2-incubating'
+    testCompile 'com.github.tomakehurst:wiremock:1.57'
+    testCompile ('org.mockito:mockito-all:1.10.19') {
+        exclude group: 'org.hamcrest'
+    }
+
+    testCompile group: 'org.jboss.arquillian.junit', name: 'arquillian-junit-container'
+    testCompile 'org.apache.tomee:arquillian-tomee-remote:7.0.0-M1'
+    //testCompile 'org.apache.tomee:tomee-jaxrs:7.0.0-M1'
+    testCompile 'com.jayway.restassured:rest-assured:2.8.0'
+}
+
+testSets {
+    integrationTests
+}
