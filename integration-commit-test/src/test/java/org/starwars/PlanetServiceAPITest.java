@@ -1,12 +1,7 @@
 package org.starwars;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 
-import static org.junit.Assert.assertThat;
-
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.jayway.restassured.RestAssured;
 import org.hamcrest.Matchers;
@@ -27,6 +22,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+
+import static org.junit.Assert.assertThat;
 
 @RunWith(Arquillian.class)
 public class PlanetServiceAPITest {

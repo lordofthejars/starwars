@@ -1,0 +1,28 @@
+apply plugin: 'java'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "io.spring.gradle:dependency-management-plugin:0.5.3.RELEASE"
+    }
+}
+
+apply plugin: "io.spring.dependency-management"
+
+dependencyManagement {
+    imports {
+        mavenBom 'org.jboss.arquillian:arquillian-bom:1.1.10.Final'
+    }
+}
+
+dependencies {
+    testCompile rootProject
+
+    testCompile 'junit:junit:4.12'
+    testCompile group: 'org.jboss.arquillian.junit', name: 'arquillian-junit-container'
+    testCompile 'org.apache.tomee:arquillian-tomee-remote:7.0.0-M1'
+    testCompile 'com.jayway.restassured:rest-assured:2.8.0'
+    testCompile 'com.github.tomakehurst:wiremock:1.57'
+}

@@ -1,2 +1,3 @@
 
 rootProject.name = 'starwars'
+include 'integration-commit-test'
