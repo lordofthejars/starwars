@@ -1,11 +1,26 @@
 stage 'compileAndUnit'
 
 node {
+        // get source code
         git branch: 'master', url: 'https://github.com/lordofthejars/starwars.git'
 
-        gradle 'clean test'
+        // check that the whole project compiles
+        gradle 'clean compileJava'
+
+        // save source code so we don't need to get it every time and also avoids conflicts
         stash excludes: 'build/', includes: '**', name: 'source'
+
+        parallel (
+             "unit tests" : {
+                gradle ':test'
+             },
+             "commit integration tests" : {
+                gradle ':integration-commit-test:test'
+             }
+           )
+
         stash includes: 'build/jacoco/*.exec', name: 'unitCodeCoverage'
+        stash includes: 'integration-commit-test/build/jacoco/*.exec', name: 'commitIntegrationCodeCoverage'
         step([$class: 'JUnitResultArchiver', testResults: '**/build/test-results/*.xml'])
 }
 
@@ -21,7 +36,8 @@ parallel 'pmd' : {
     node {
         unstash 'source'
         unstash 'unitCodeCoverage'
-        gradle 'jacocoTestReport'
+        unstash 'commitIntegrationCodeCoverage'
+        gradle 'jacocoRootTestReport'
         publishHTML(target: [reportDir:'build/reports/jacoco/test/html', reportFiles: 'index.html', reportName: 'Code Coverage'])
     }
 }
@@ -45,11 +61,20 @@ node {
 
 input message: "Deploy Application to QA ?"
 
+setCheckpoint('Before Deploying to QA')
+
 stage name: 'Deploy to QA', concurrency: 1
 node {
     echo "Star Wars Application Deployed to QA."
 }
 
+void setCheckpoint(String message) {
+    try {
+        checkpoint(message)
+    } catch (NoSuchMethodError _) {
+        echo 'Checkpoint feature available in CloudBees Jenkins Enterprise.'
+    }
+}
 
 void gradle(String tasks, String switches = null) {
     String gradleCommand = "";
