@@ -3,6 +3,7 @@ apply plugin: 'pmd'
 apply plugin: 'maven-publish'
 
 
+// all projects need JaCoCo integration, compiling in Java 8 and similar group and version strategy
 allprojects {
     apply plugin: 'jacoco'
 
@@ -22,13 +23,14 @@ allprojects {
 
 }
 
+// there are dependencies that are common on core project (this) and all other subprojects, like testing libraries
 dependencies {
     providedCompile 'javax:javaee-api:7.0'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.apache.cxf:cxf-rt-rs-client:3.1.4'
     testCompile 'org.apache.johnzon:johnzon-jaxrs:0.9.2-incubating'
-    testCompile 'com.github.tomakehurst:wiremock:1.57'
+    testCompile 'com.github.tomakehurst:wiremock:2.0.8-beta'
     testCompile('org.mockito:mockito-all:1.10.19') {
         exclude group: 'org.hamcrest'
     }
@@ -36,20 +38,26 @@ dependencies {
 }
 
 
-//change the path to get from multiproject (with variable or something)
-
+// aggregates jacoco resutls from all subprojects and core project and generate a report
 task jacocoRootTestReport(type: JacocoReport) {
+
     sourceSets sourceSets.main
-    executionData files([
-            "$buildDir/jacoco/test.exec",
-            "$buildDir/jacoco/integrationTests.exec"
-    ])
+
+    def jacocoTestFiles = ["$buildDir/jacoco/test.exec"]
+    subprojects.each { p ->
+        jacocoTestFiles << "$p.buildDir/jacoco/test.exec"
+    }
+
+    executionData files(jacocoTestFiles)
+
     reports {
         xml.enabled false
         csv.enabled false
     }
 }
 
+
+// add pmd static code analysis
 pmd {
     ignoreFailures = true
     ruleSets = [
@@ -57,13 +65,16 @@ pmd {
     ]
 }
 
+// initialize ext.config object with configuration parameters
 apply from: "$rootDir/gradle/configuring.gradle"
 
+// change version of all projects to version + (jenkinsBuild?)
 allprojects {
     apply from: "$rootDir/gradle/versioning.gradle"
     ext.config = rootProject.ext.parsedConfig
 }
 
+// adds a build-info file inside war file
 task createBuildInfoFile << {
     def buildInfoFile = new File("$buildDir/build-info.properties")
     Properties props = new Properties()
@@ -72,14 +83,20 @@ task createBuildInfoFile << {
     props.store(buildInfoFile.newWriter(), null)
 }
 
+// creates war with Manifest and build file information
 war {
     dependsOn createBuildInfoFile
     from(buildDir) {
         include 'build-info.properties'
         into('WEB-INF/classes')
     }
+    manifest {
+        attributes "Cersion": project.version.toString()
+    }
 }
 
+// to publish artifact (war) we need to create sourceJar (jar with sources) and javadocJar (jar with javadoc) tasks
+// so those are called and attached to the publish
 task sourceJar(type: Jar) {
     from sourceSets.main.allJava
 }
@@ -88,15 +105,19 @@ task javadocJar (type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
+// gets from config variable the location where artifacts are published
 ext.repoUrl = "$config.binaryRepository.url/$config.binaryRepository.name"
 
+// publish artifact to
 publishing {
     publications {
         webApp(MavenPublication){
             from components.web
+            // sourceJar task created previously
             artifact sourceJar {
                 classifier "sources"
             }
+            // javadocJar task created previously
             artifact javadocJar {
                 classifier "javadoc"
             }
