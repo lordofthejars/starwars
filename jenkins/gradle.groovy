@@ -1,5 +1,5 @@
-def cleanAndCompile() {
-
+def cleanAndCompile(String switches = null) {
+    run 'clean compileJava', switches
 }
 
 def test(project) {

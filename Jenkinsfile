@@ -1,8 +1,13 @@
 stage 'compileAndUnit'
 
+def gr;
+
 node {
+
         // get source code
-        git branch: 'master', url: 'https://github.com/lordofthejars/starwars.git'
+        checkout scm
+
+        //gr = load 'jenkins/gradle.groovy'
 
         // check that the whole project compiles
         gradle 'clean compileJava'

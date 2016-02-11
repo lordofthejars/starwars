@@ -91,7 +91,7 @@ war {
         into('WEB-INF/classes')
     }
     manifest {
-        attributes "Cersion": project.version.toString()
+        attributes "Version": project.version.toString()
     }
 }
 
