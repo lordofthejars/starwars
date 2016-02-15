@@ -1,16 +1,17 @@
 stage 'compileAndUnit'
 
-def gr;
+def gradle;
 
 node {
 
         // get source code
         checkout scm
 
-        //gr = load 'jenkins/gradle.groovy'
+        gradle = load 'jenkins/gradle.groovy'
 
         // check that the whole project compiles
-        gradle 'clean compileJava'
+        //gradle 'clean compileJava'
+        gradle.cleanAndCompile()
 
         // save source code so we don't need to get it every time and also avoids conflicts
         stash excludes: 'build/', includes: '**', name: 'source'
@@ -18,10 +19,10 @@ node {
         // execute required tests for commit stage in parallel
         parallel (
              "unit tests" : {
-                gradle ':test'
+                gradle.test()
              },
              "commit integration tests" : {
-                gradle ':integration-commit-test:test'
+                gradle.test('integration-commit-test')
              }
            )
 
@@ -42,7 +43,7 @@ node {
             // static code analysis
             unstash 'source'
 
-            gradle 'pmdMain'
+            gradle.codeQuality()
             step([$class: 'PmdPublisher', pattern: 'build/reports/pmd/*.xml'])
         },
         'jacoco': {
@@ -51,7 +52,7 @@ node {
             unstash 'unitCodeCoverage'
             unstash 'commitIntegrationCodeCoverage'
 
-            gradle 'jacocoRootTestReport'
+            gradle.aggregateJaCoCoReports()
             publishHTML(target: [reportDir:'build/reports/jacoco/jacocoRootTestReport/html', reportFiles: 'index.html', reportName: 'Code Coverage'])
         }
       )
@@ -62,7 +63,7 @@ stage 'assemble-binaries'
 node {
     unstash 'source'
     withEnv(["SOURCE_BUILD_NUMBER=${env.BUILD_NUMBER}"]) {
-        gradle 'assemble'
+        gradle.assembleApplication()
     }
 
     // docker
@@ -71,13 +72,11 @@ node {
 }
 
 
-
-
 stage name: 'publish-binaries', concurrency: 1
 
 node {
     unstash 'source'
-    gradle 'publish'
+    gradle.publishApplication()
 }
 
 input message: "Deploy Application to QA ?"
