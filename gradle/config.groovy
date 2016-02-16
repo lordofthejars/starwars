@@ -4,9 +4,11 @@ binaryRepository {
 }
 environments {
     test {
-        server {
-            hostname = 'localhost'
-            port = 8080
+        docker {
+            registry = 'http://localhost:5000'
+            registryDomain = 'localhost:5000'
+            username = 'test'
+            imageName = 'starwars'
         }
     }
 }

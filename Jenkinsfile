@@ -60,15 +60,16 @@ node {
 
 stage 'assemble-binaries'
 
+def starwarsImage;
+
 node {
     unstash 'source'
     withEnv(["SOURCE_BUILD_NUMBER=${env.BUILD_NUMBER}"]) {
         gradle.assembleApplication()
     }
 
-    // docker
-
-    // container tests
+   //docker
+   // container tests
 }
 
 
@@ -76,7 +77,15 @@ stage name: 'publish-binaries', concurrency: 1
 
 node {
     unstash 'source'
-    gradle.publishApplication()
+    withEnv(["SOURCE_BUILD_NUMBER=${env.BUILD_NUMBER}"]) {
+        gradle.publishApplication()
+
+        def configFile = readFile 'gradle/config.groovy'
+        def parsedConfig = new ConfigSlurper('test').parse(configFile)
+
+        // docker
+        println parsedConfig.docker.registry
+    }
 }
 
 input message: "Deploy Application to QA ?"
