@@ -79,21 +79,21 @@ node {
     unstash 'source'
     withEnv(["SOURCE_BUILD_NUMBER=${env.BUILD_NUMBER}"]) {
         gradle.publishApplication()
-
-        def configFile = readFile 'gradle/config.groovy'
-        def parsedConfig = new ConfigSlurper('test').parse(configFile)
-
-        // docker
-        println parsedConfig.docker.registry
     }
 }
 
-input message: "Deploy Application to QA ?"
+input message: "Deploy Application to Test ?"
 
-setCheckpoint('Before Deploying to QA')
+setCheckpoint('Before Deploying to Test')
 
-stage name: 'Deploy to QA', concurrency: 1
+stage name: 'Deploy to Test', concurrency: 1
 node {
+
+    def configFile = readFile 'gradle/config.groovy'
+    def parsedConfig = new ConfigSlurper('test').parse(configFile)
+
+    // docker
+    println parsedConfig.docker.registry
     echo "Star Wars Application Deployed to QA."
 }
 
