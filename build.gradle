@@ -38,6 +38,10 @@ dependencies {
 }
 
 
+tasks.withType(JavaCompile) {
+     options.encoding = 'UTF-8'
+}
+
 // aggregates jacoco resutls from all subprojects and core project and generate a report
 task jacocoRootTestReport(type: JacocoReport) {
 
@@ -91,7 +95,7 @@ war {
         into('WEB-INF/classes')
     }
     manifest {
-        attributes "Version": project.version.toString()
+        attributes "Implementation-Version": project.version.toString()
     }
 }
 
