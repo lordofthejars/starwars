@@ -1,0 +1,12 @@
+planets:
+  env_file: envs
+  image: starwars/planets:latest
+  ports:
+      - "9090:8080"
+  links:
+      - swapi:swapi.co
+
+swapi:
+  image: lordofthejars/wiremock:2.0.9-beta
+  ports:
+      - "80:80"
