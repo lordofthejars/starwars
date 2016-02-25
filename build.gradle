@@ -49,9 +49,14 @@ task jacocoRootTestReport(type: JacocoReport) {
 
     def jacocoTestFiles = ["$buildDir/jacoco/test.exec"]
     subprojects.each { p ->
-        jacocoTestFiles << "$p.buildDir/jacoco/test.exec"
+        def coverageFileLocation = "$p.buildDir/jacoco/test.exec"
+        if (new File(coverageFileLocation).exists()) {
+            jacocoTestFiles << coverageFileLocation
+        }
     }
 
+    println 'Aggregating next JaCoCo Coverage Files: '
+    println jacocoTestFiles
     executionData files(jacocoTestFiles)
 
     reports {

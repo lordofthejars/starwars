@@ -27,3 +27,10 @@ dependencies {
         exclude group: 'com.fasterxml.jackson.core'
     }
 }
+
+test {
+    // set a default value so developers don't need to set every time these properties
+    if (!System.env.containsKey('starwars.planets') && !System.properties.containsKey('starwars.planets')) {
+        systemProperty 'starwars.planets', 'starwars/planets:latest'
+    }
+}
