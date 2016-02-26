@@ -5,6 +5,7 @@ buildscript {
     }
     dependencies {
         classpath 'org.ajoberstar:grgit:1.5.0'
+        classpath 'com.bmuschko:gradle-docker-plugin:2.6.5'
     }
 }
 
@@ -33,7 +34,7 @@ allprojects {
 
 }
 
-// there are dependencies that are common on core project (this) and all other subprojects, like testing libraries
+// there are dependencies that are common on core project (this) and all other subprojects like testing libraries
 dependencies {
     providedCompile 'javax:javaee-api:7.0'
 
@@ -96,6 +97,7 @@ allprojects {
 // adds a build-info file inside war file
 task createBuildInfoFile << {
 
+    // get Git information
     ext.repo = org.ajoberstar.grgit.Grgit.open(project.file('.'))
 
     def buildInfoFile = new File("$buildDir/build-info.properties")
@@ -116,6 +118,24 @@ war {
     manifest {
         attributes "Implementation-Version": project.version.toString()
     }
+}
+
+// creates Docker image for developers
+// IMPORTANT: this task is not intend to be used by Jenkins
+// Now to work with Docker-Machine
+
+apply plugin: 'com.bmuschko.docker-remote-api'
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+
+docker {
+    url = System.env.DOCKER_HOST.replace("tcp", "https")
+    certPath = new File(System.env.DOCKER_CERT_PATH)
+}
+
+task buildImage(type: DockerBuildImage) {
+    dependsOn assemble
+    inputDir = project.rootDir
+    tag = "${config.common.docker.organization}/${config.common.docker.image}:latest"
 }
 
 // to publish artifact (war) we need to create sourceJar (jar with sources) and javadocJar (jar with javadoc) tasks

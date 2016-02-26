@@ -2,7 +2,6 @@ stage 'compileAndUnit'
 
 def gradle;
 
-
 node {
 
         // get source code
@@ -39,7 +38,7 @@ stage 'codeQuality'
 
 node {
 
-    parallel (
+   parallel (
         'pmd' : {
             // static code analysis
             unstash 'source'
@@ -88,12 +87,15 @@ node {
         currentBuild.result = "UNSTABLE"
     }
 
+    // load configuration for knowing the name of the image
+    def content = readFile('gradle/config.groovy')
+    def configuration = gradle.conf(content)
+
     // purge old docker images
-    dockerImages.purge("starwars/planets", 2)
+    dockerImages.purge("${configuration['common.docker.organization']}/${configuration['common.docker.image']}", 2)
 
     // create docker image with version
-
-    starwarsImage = docker.build "starwars/planets:${tagVersion}"
+    starwarsImage = docker.build "${configuration['common.docker.organization']}/${configuration['common.docker.image']}:${tagVersion}"
 
     // runs container tests to be sure that the image is correctly created and it works
 
@@ -115,12 +117,6 @@ setCheckpoint('Before Deploying to Test')
 
 stage name: 'Deploy to Test', concurrency: 1
 node {
-
-    def configFile = readFile 'gradle/config.groovy'
-    def parsedConfig = new ConfigSlurper('test').parse(configFile)
-
-    // docker
-    println parsedConfig.docker.registry
     echo "Star Wars Application Deployed to QA."
 }
 

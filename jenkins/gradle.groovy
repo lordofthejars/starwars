@@ -1,3 +1,6 @@
+import com.cloudbees.groovy.cps.NonCPS
+import groovy.util.ConfigSlurper
+
 def cleanAndCompile(String switches = null) {
     run 'clean compileJava', switches
 }
@@ -25,6 +28,14 @@ def assembleApplication(String switches = null) {
 
 def publishApplication(String switches = null) {
     run 'publish', switches
+}
+
+@NonCPS
+Map conf(String content, String env = 'test') {
+    def parsedConfig = new ConfigSlurper(env).parse(content)
+    def map = [:]
+    parsedConfig.flatten(map)
+    return map
 }
 
 void run(String tasks, String switches = null) {
