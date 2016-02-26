@@ -1,3 +1,13 @@
+// Add to classpath dependencies for building the script
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.ajoberstar:grgit:1.5.0'
+    }
+}
+
 apply plugin: 'war'
 apply plugin: 'pmd'
 apply plugin: 'maven-publish'
@@ -85,10 +95,14 @@ allprojects {
 
 // adds a build-info file inside war file
 task createBuildInfoFile << {
+
+    ext.repo = org.ajoberstar.grgit.Grgit.open(project.file('.'))
+
     def buildInfoFile = new File("$buildDir/build-info.properties")
     Properties props = new Properties()
     props.setProperty('version', project.version.toString())
     props.setProperty('timestamp', project.buildTimestamp)
+    props.setProperty('git_commit', repo.head().id)
     props.store(buildInfoFile.newWriter(), null)
 }
 
