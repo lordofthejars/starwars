@@ -3,6 +3,7 @@ package org.starwars;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.jayway.restassured.RestAssured;
 import org.arquillian.cube.HostIp;
+import org.arquillian.cube.HostPort;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.jboss.arquillian.junit.Arquillian;
@@ -15,7 +16,6 @@ import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 
@@ -29,9 +29,15 @@ public class PlanetServiceAPIContainerTest {
     @HostIp
     private String ip;
 
+    @HostPort(containerName = "planets", value = 8080)
+    int planetsPort;
+
+    @HostPort(containerName = "swapi", value = 80)
+    int swapiPort;
+
     @Before
     public void setup() {
-        WireMock.configureFor(ip, 80);
+        WireMock.configureFor(ip, swapiPort);
     }
 
     @After
@@ -51,7 +57,7 @@ public class PlanetServiceAPIContainerTest {
                         .withBody(Files.readAllBytes(configFile.toPath())))
         );
 
-        URL url = new URL("http://" + ip + ":9090/starwars/");
+        URL url = new URL("http://" + ip + ":" + planetsPort + "/starwars/");
         final String average = RestAssured.get(url.toExternalForm() + "rest/planet/rotation/average").asString();
         assertThat(average, is("1699.42"));
     }

@@ -128,8 +128,10 @@ apply plugin: 'com.bmuschko.docker-remote-api'
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 
 docker {
-    url = System.env.DOCKER_HOST.replace("tcp", "https")
-    certPath = new File(System.env.DOCKER_CERT_PATH)
+    if (System.env.containsKey('DOCKER_HOST') && System.env.containsKey('DOCKER_CERT_PATH')) {
+        url = System.env.DOCKER_HOST.replace("tcp", "https")
+        certPath = new File(System.env.DOCKER_CERT_PATH)
+    }
 }
 
 task buildImage(type: DockerBuildImage) {

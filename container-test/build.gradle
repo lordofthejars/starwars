@@ -20,7 +20,7 @@ dependencyManagement {
 dependencies {
     testCompile 'junit:junit:4.12'
     testCompile group: 'org.jboss.arquillian.junit', name: 'arquillian-junit-standalone'
-    testCompile 'org.arquillian.cube:arquillian-cube-docker:1.0.0.Alpha8'
+    testCompile 'org.arquillian.cube:arquillian-cube-docker:1.0.0.Alpha9'
     testCompile 'com.jayway.restassured:rest-assured:2.8.0'
 
     testCompile ('com.github.tomakehurst:wiremock:2.0.9-beta') {
