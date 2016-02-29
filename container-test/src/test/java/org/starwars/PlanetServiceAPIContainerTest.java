@@ -48,6 +48,7 @@ public class PlanetServiceAPIContainerTest {
     @Test
     public void shouldReturnTheAverage() throws IOException {
 
+        // Prepare swapi recording
         File configFile = new File(Thread.currentThread().getContextClassLoader()
                 .getResource("planets.json").getFile());
 
@@ -57,6 +58,7 @@ public class PlanetServiceAPIContainerTest {
                         .withBody(Files.readAllBytes(configFile.toPath())))
         );
 
+        // Launch our service which need swapi.
         URL url = new URL("http://" + ip + ":" + planetsPort + "/starwars/");
         final String average = RestAssured.get(url.toExternalForm() + "rest/planet/rotation/average").asString();
         assertThat(average, is("1699.42"));
