@@ -31,6 +31,7 @@ dependencies {
 test {
     // set a default value so developers don't need to set every time these properties
     if (!System.env.containsKey('starwars.planets') && !System.properties.containsKey('starwars.planets')) {
+        logger.quiet('No starwars.planets var defined and latest is used as container version')
         systemProperty 'starwars.planets', 'starwars/planets:latest'
     }
 }

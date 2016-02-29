@@ -94,11 +94,15 @@ node {
     // purge old docker images
     dockerImages.purge("${configuration['common.docker.organization']}/${configuration['common.docker.image']}", 2)
 
+    def planetsImageName = "${configuration['common.docker.organization']}/${configuration['common.docker.image']}:${tagVersion}"
+
     // create docker image with version
-    starwarsImage = docker.build "${configuration['common.docker.organization']}/${configuration['common.docker.image']}:${tagVersion}"
+    starwarsImage = docker.build planetsImageName
 
     // runs container tests to be sure that the image is correctly created and it works
-
+    withEnv(["starwars.planets=${planetsImageName}"]) {
+        gradle.test('container-test')
+    }
 }
 
 
@@ -106,9 +110,7 @@ stage name: 'publish-binaries', concurrency: 1
 
 node {
     unstash 'source'
-    withEnv(["SOURCE_BUILD_NUMBER=${env.BUILD_NUMBER}"]) {
-        gradle.publishApplication()
-    }
+    gradle.publishApplication()
 }
 
 input message: "Deploy Application to Test ?"
