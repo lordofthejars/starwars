@@ -4,13 +4,9 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.jayway.restassured.RestAssured;
 import org.arquillian.cube.HostIp;
 import org.arquillian.cube.HostPort;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matchers;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -29,7 +25,7 @@ public class PlanetServiceAPIContainerTest {
     @HostIp
     private String ip;
 
-    @HostPort(containerName = "planets", value = 8080)
+    @HostPort(containerName = "planetstest", value = 8080)
     int planetsPort;
 
     @HostPort(containerName = "swapi", value = 80)

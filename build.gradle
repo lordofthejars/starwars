@@ -66,8 +66,7 @@ task jacocoRootTestReport(type: JacocoReport) {
         }
     }
 
-    println 'Aggregating next JaCoCo Coverage Files: '
-    println jacocoTestFiles
+    logger.info('Aggregating next JaCoCo Coverage Files: {}', jacocoTestFiles)
     executionData files(jacocoTestFiles)
 
     reports {

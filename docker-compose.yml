@@ -1,0 +1,5 @@
+planets:
+  env_file: envs
+  image: ${starwars.planets}
+  ports:
+      - "9090:8080"

@@ -1,8 +1,8 @@
-planets:
-  env_file: envs
+planetstest:
+  extends:
+      file: ../docker-compose.yml
+      service: planets
   image: ${starwars.planets}
-  ports:
-      - "9090:8080"
   links:
       - swapi:swapi.co
 
