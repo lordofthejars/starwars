@@ -18,7 +18,7 @@ public class PlanetServiceTest {
 
         final JsonObject planets = Json.createReader(PlanetServiceTest.class.getResourceAsStream("/planets.json")).readObject();
         PlanetService planetService = new PlanetService();
-        final double average = planetService.calculateAverageOfRotationPeriod(planets.getJsonArray("results"));
+        final double average = planetService.calculateAverageOfOrbitalPeriod(planets.getJsonArray("results"));
 
         DecimalFormat decimalFormat = new DecimalFormat("#.##");
         decimalFormat.setRoundingMode(RoundingMode.DOWN);

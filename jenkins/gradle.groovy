@@ -30,6 +30,10 @@ def publishApplication(String switches = null) {
     run 'publish', switches
 }
 
+def aggregateSerenityReports(String switches = null) {
+    run ':acceptance-test:aggregate', switches
+}
+
 @NonCPS
 Map conf(String content, String env = 'test') {
     def parsedConfig = new ConfigSlurper(env).parse(content)

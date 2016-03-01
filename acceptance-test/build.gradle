@@ -1,0 +1,57 @@
+ext {
+    serenity_version = "1.1.28"
+}
+
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+    }
+    dependencies {
+        classpath("net.serenity-bdd:serenity-gradle-plugin:1.1.28")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: "net.serenity-bdd.aggregator"
+
+
+dependencies {
+    compile "net.serenity-bdd:serenity-core:$serenity_version"
+    compile "net.serenity-bdd:serenity-junit:$serenity_version"
+    compile("net.serenity-bdd:serenity-screenplay:$serenity_version")
+    compile("net.serenity-bdd:serenity-rest-assured:$serenity_version")
+    compile 'org.codehaus.groovy:groovy-all:2.3.10'
+    compile 'junit:junit:4.12'
+}
+
+test {
+    testLogging {
+        showStandardStreams = true
+    }
+    systemProperties System.getProperties()
+
+    def starwarsUrl;
+    if (!System.env.containsKey('starwars_planets_url') && !System.properties.containsKey('starwars_planets_url')) {
+        if (System.env.containsKey('DOCKER_HOST')) {
+            starwarsUrl = System.env.DOCKER_HOST.replace("tcp", "http").replace("2376", "9090") + "/starwars/"
+        } else {
+            starwarsUrl = "http://localhost:8080/starwars/"
+        }
+    }
+    systemProperties['starwars_planets_url'] = starwarsUrl
+}
+
+// not failing at first but executing all tests
+gradle.startParameter.continueOnFailure = true
+
+// Tasks defined in dockercompose.gradle added in root script
+startDockerCompose.onlyIf {project.hasProperty('env') && project.getProperty('env') == 'dev'}
+stopDockerCompose.onlyIf {project.hasProperty('env') && project.getProperty('env') == 'dev'}
+removeDockerCompose.onlyIf {project.hasProperty('env') && project.getProperty('env') == 'dev'}
+
+test.dependsOn startDockerCompose
+test.finalizedBy removeDockerCompose
+
+
+

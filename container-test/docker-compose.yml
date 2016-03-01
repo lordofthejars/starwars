@@ -2,7 +2,7 @@ planetstest:
   extends:
       file: ../docker-compose.yml
       service: planets
-  image: ${starwars.planets}
+  image: ${starwars_planets}
   links:
       - swapi:swapi.co
 

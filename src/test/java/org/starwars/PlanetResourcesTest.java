@@ -35,19 +35,19 @@ public class PlanetResourcesTest {
     ArgumentCaptor<Response> responseArgumentCaptor;
 
     @Test
-    public void shouldCalculateTheAverageOfRotationOfAllPlanets() {
+    public void shouldCalculateTheAverageOfOrOfAllPlanets() {
 
         final JsonObject planets = Json.createReader(PlanetResourcesTest.class.getResourceAsStream("/planets.json")).readObject();
 
         when(swapiGateway.getAllPlanets()).thenReturn(planets);
-        when(planetService.calculateAverageOfRotationPeriod(planets.getJsonArray("results"))).thenReturn(12.23D);
+        when(planetService.calculateAverageOfOrbitalPeriod(planets.getJsonArray("results"))).thenReturn(12.23D);
 
         PlanetResources planetResources = new PlanetResources();
         planetResources.swapiGateway = swapiGateway;
         planetResources.planetService = planetService;
         planetResources.averageFormatter = new AverageFormatterProducer().averageFormatter();
 
-        planetResources.calculateAverageOfRotation(asyncResponse);
+        planetResources.calculateAverageOfOrbitalPeriod(asyncResponse);
 
         verify(asyncResponse).resume(responseArgumentCaptor.capture());
         final Response response = responseArgumentCaptor.getValue();

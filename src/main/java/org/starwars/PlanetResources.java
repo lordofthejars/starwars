@@ -36,13 +36,13 @@ public class PlanetResources {
     DecimalFormat averageFormatter;
 
     @GET
-    @Path("/rotation/average")
+    @Path("/orbital/average")
     @Produces(MediaType.TEXT_PLAIN)
     @Asynchronous
-    public void calculateAverageOfRotation(@Suspended final AsyncResponse response) {
+    public void calculateAverageOfOrbitalPeriod(@Suspended final AsyncResponse response) {
         JsonObject planets = swapiGateway.getAllPlanets();
         final JsonArray results = planets.getJsonArray("results");
-        double average = planetService.calculateAverageOfRotationPeriod(results);
+        double average = planetService.calculateAverageOfOrbitalPeriod(results);
         final Response averageResponse = Response.accepted(averageFormatter.format(average)).build();
         response.resume(averageResponse);
     }

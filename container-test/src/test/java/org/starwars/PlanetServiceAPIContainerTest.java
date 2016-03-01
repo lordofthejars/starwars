@@ -19,6 +19,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
+// IMPORTANT: You need to set starwars.planets var to docker image like starwars/planets:latest
+
 @RunWith(Arquillian.class)
 public class PlanetServiceAPIContainerTest {
 
@@ -56,7 +58,7 @@ public class PlanetServiceAPIContainerTest {
 
         // Launch our service which need swapi.
         URL url = new URL("http://" + ip + ":" + planetsPort + "/starwars/");
-        final String average = RestAssured.get(url.toExternalForm() + "rest/planet/rotation/average").asString();
+        final String average = RestAssured.get(url.toExternalForm() + "rest/planet/orbital/average").asString();
         assertThat(average, is("1699.42"));
     }
 }

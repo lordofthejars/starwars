@@ -57,7 +57,7 @@ public class PlanetServiceAPITest {
 
     @Test
     public void shouldReturnTheAverage() {
-        final String average = RestAssured.get(url.toExternalForm() + "rest/planet/rotation/average").asString();
+        final String average = RestAssured.get(url.toExternalForm() + "rest/planet/orbital/average").asString();
         assertThat(average, Matchers.is("1699.42"));
     }
 

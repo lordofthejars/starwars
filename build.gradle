@@ -91,6 +91,7 @@ apply from: "$rootDir/gradle/configuring.gradle"
 allprojects {
     apply from: "$rootDir/gradle/versioning.gradle"
     ext.config = rootProject.ext.parsedConfig
+    apply from: "$rootDir/gradle/dockercompose.gradle"
 }
 
 // adds a build-info file inside war file
@@ -138,6 +139,7 @@ task buildImage(type: DockerBuildImage) {
     inputDir = project.rootDir
     tag = "${config.common.docker.organization}/${config.common.docker.image}:latest"
 }
+buildImage.onlyIf {project.hasProperty('env') && project.getProperty('env') == 'dev'}
 
 // to publish artifact (war) we need to create sourceJar (jar with sources) and javadocJar (jar with javadoc) tasks
 // so those are called and attached to the publish

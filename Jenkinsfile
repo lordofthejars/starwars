@@ -63,6 +63,9 @@ stage 'assemble-binaries'
 def dockerImages
 def starwarsImage
 
+def tagVersion = "latest"
+def planetsImageName;
+
 node {
 
     dockerImages = load 'jenkins/docker.groovy'
@@ -76,7 +79,6 @@ node {
 
     // find created war, read the manifest to take the version
 
-    def tagVersion = 'latest'
     def warFiles = findFiles(glob: 'build/libs/*.war')
 
     if (warFiles.length == 1) {
@@ -94,15 +96,17 @@ node {
     // purge old docker images
     dockerImages.purge("${configuration['common.docker.organization']}/${configuration['common.docker.image']}", 2)
 
-    def planetsImageName = "${configuration['common.docker.organization']}/${configuration['common.docker.image']}:${tagVersion}"
+    planetsImageName = "${configuration['common.docker.organization']}/${configuration['common.docker.image']}:${tagVersion}"
 
     // create docker image with version
     starwarsImage = docker.build planetsImageName
 
     // runs container tests to be sure that the image is correctly created and it works
-    withEnv(["starwars.planets=${planetsImageName}"]) {
+    withEnv(["starwars_planets=${planetsImageName}"]) {
         gradle.test('container-test')
+        step([$class: 'JUnitResultArchiver', testResults: 'container-test/build/test-results/*.xml'])
     }
+
 }
 
 
@@ -113,13 +117,21 @@ node {
     gradle.publishApplication()
 }
 
-input message: "Deploy Application to Test ?"
+input message: "Deploy Application to Local"
 
 setCheckpoint('Before Deploying to Test')
 
-stage name: 'Deploy to Test', concurrency: 1
+stage name: 'Deploy to Local', concurrency: 1
 node {
-    echo "Star Wars Application Deployed to QA."
+    unstash 'source'
+    withEnv(["starwars_planets=${planetsImageName}"]) {
+        gradle.run(':acceptance-test:startDockerCompose')
+        gradle.test('acceptance-test')
+        gradle.run(':acceptance-test:aggregate')
+        publishHTML(target: [reportDir:'acceptance-test/target/site/serenity', reportFiles: 'index.html', reportName: 'SerenityBDD report'])
+        step([$class: 'JUnitResultArchiver', testResults: 'acceptance-test/build/test-results/*.xml'])
+        gradle.run(':acceptance-test:removeDockerCompose')
+    }
 }
 
 void setCheckpoint(String message) {
