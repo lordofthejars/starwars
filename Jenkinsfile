@@ -125,12 +125,18 @@ stage name: 'Deploy to Local', concurrency: 1
 node {
     unstash 'source'
     withEnv(["starwars_planets=${planetsImageName}"]) {
-        gradle.run(':acceptance-test:startDockerCompose')
-        gradle.test('acceptance-test')
-        gradle.run(':acceptance-test:aggregate')
-        publishHTML(target: [reportDir:'acceptance-test/target/site/serenity', reportFiles: 'index.html', reportName: 'SerenityBDD report'])
-        step([$class: 'JUnitResultArchiver', testResults: 'acceptance-test/build/test-results/*.xml'])
-        gradle.run(':acceptance-test:removeDockerCompose')
+        try {
+            gradle.run('startDockerCompose')
+            gradle.test('acceptance-test')
+            gradle.run(':acceptance-test:aggregate')
+            publishHTML(target: [reportDir:'acceptance-test/target/site/serenity', reportFiles: 'index.html', reportName: 'SerenityBDD report'])
+            step([$class: 'JUnitResultArchiver', testResults: 'acceptance-test/build/test-results/*.xml'])
+
+            gradle.test('stress-test')
+            //publish gatling reports
+        } finally {
+            gradle.run('removeDockerCompose')
+        }
     }
 }
 

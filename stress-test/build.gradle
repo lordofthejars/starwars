@@ -1,0 +1,51 @@
+apply plugin: 'java'
+apply plugin: 'scala'
+
+def gatlingVersion = "2.1.7"
+
+dependencies {
+    compile "org.scala-lang:scala-library:2.11.7"
+    testCompile "io.gatling:gatling-app:${gatlingVersion}"
+    testCompile "io.gatling.highcharts:gatling-charts-highcharts:${gatlingVersion}"
+}
+
+task runLoadTest(type: JavaExec) {
+    dependsOn testClasses
+    description = 'Stress Test Calculating Orbital Period'
+    classpath = sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath
+
+    jvmArgs = [ "-Dgatling.core.directory.binaries=${sourceSets.test.output.classesDir.toString()}" ]
+    // Gatling application
+    main = "io.gatling.app.Gatling"
+    // Specify the simulation to run
+    args = [
+            "--simulation", "org.starwars.AverageOrbitalPeriodSimulation",
+            "--results-folder", "${buildDir}/reports/gatling-results",
+            "--binaries-folder", sourceSets.test.output.classesDir.toString(),
+            "--output-name", "averageorbitalperiodsimulation",
+            "--bodies-folder", sourceSets.test.resources.srcDirs.toList().first().toString() + "/gatling/bodies",
+    ]
+}
+
+test {
+    systemProperties System.getProperties()
+
+    def starwarsUrl;
+    if (!System.env.containsKey('starwars_planets_url') && !System.properties.containsKey('starwars_planets_url')) {
+        if (System.env.containsKey('DOCKER_HOST')) {
+            starwarsUrl = System.env.DOCKER_HOST.replace("tcp", "http").replace("2376", "9090") + "/starwars/"
+        } else {
+            starwarsUrl = "http://localhost:8080/starwars/"
+        }
+    }
+    systemProperties['starwars_planets_url'] = starwarsUrl
+}
+
+test.dependsOn runLoadTest
+
+// Tasks defined in dockercompose.gradle added in root script
+
+if (project.hasProperty('env') && project.getProperty('env') == 'dev') {
+    test.dependsOn startDockerCompose
+    test.finalizedBy removeDockerCompose
+}
