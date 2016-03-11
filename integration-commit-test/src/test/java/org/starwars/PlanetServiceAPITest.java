@@ -2,8 +2,12 @@ package org.starwars;
 
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.http.Fault;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.jayway.restassured.RestAssured;
+import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -23,6 +27,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 @RunWith(Arquillian.class)
@@ -58,7 +63,14 @@ public class PlanetServiceAPITest {
     @Test
     public void shouldReturnTheAverage() {
         final String average = RestAssured.get(url.toExternalForm() + "rest/planet/orbital/average").asString();
-        assertThat(average, Matchers.is("1699.42"));
+        assertThat(average, is("1699.42"));
+    }
+
+    @Test
+    public void shouldReturnCodeErrorProvidedBySwapi() {
+        WireMock.reset();
+        final int statusCode = RestAssured.get(url.toExternalForm() + "rest/planet/orbital/average").getStatusCode();
+        assertThat(statusCode, is(404));
     }
 
 }
