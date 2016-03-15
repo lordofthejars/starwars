@@ -22,7 +22,7 @@ node {
                 gradle.test()
              },
              "commit integration tests" : {
-                gradle.test('integration-commit-test')
+                gradle.test('integration-test')
              }
            )
 
