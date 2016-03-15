@@ -4,9 +4,12 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'org.ajoberstar:grgit:1.5.0'
         classpath 'com.bmuschko:gradle-docker-plugin:2.6.5'
     }
+}
+
+plugins {
+    id 'net.nemerosa.versioning' version '1.5.0'
 }
 
 apply plugin: 'war'
@@ -98,14 +101,11 @@ allprojects {
 // adds a build-info file inside war file
 task createBuildInfoFile << {
 
-    // get Git information
-    ext.repo = org.ajoberstar.grgit.Grgit.open(project.file('.'))
-
     def buildInfoFile = new File("$buildDir/build-info.properties")
     Properties props = new Properties()
     props.setProperty('version', project.version.toString())
     props.setProperty('timestamp', project.buildTimestamp)
-    props.setProperty('git_commit', repo.head().id)
+    props.setProperty('git_commit', versioning.info.build)
     props.store(buildInfoFile.newWriter(), null)
 }
 
