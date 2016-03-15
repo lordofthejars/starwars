@@ -14,9 +14,27 @@ task runLoadTest(type: JavaExec) {
     description = 'Stress Test Calculating Orbital Period'
     classpath = sourceSets.main.runtimeClasspath + sourceSets.test.runtimeClasspath
 
+    def starwarsUrl;
+    if (!System.env.containsKey('starwars_planets_url') && !System.properties.containsKey('starwars_planets_url')) {
+        if (System.env.containsKey('DOCKER_HOST')) {
+            starwarsUrl = System.env.DOCKER_HOST.replace("tcp", "http").replace("2376", "9090") + "/starwars/"
+        } else {
+            starwarsUrl = "http://localhost:8080/starwars/"
+        }
+    }
+
+
     jvmArgs = [ "-Dgatling.core.directory.binaries=${sourceSets.test.output.classesDir.toString()}" ]
+
+    // Means that the url has been calculated here
+    if (starwarsUrl != null) {
+        environment["starwars_planets_url"] = starwarsUrl
+    }
+
     // Gatling application
     main = "io.gatling.app.Gatling"
+
+
     // Specify the simulation to run
     args = [
             "--simulation", "org.starwars.AverageOrbitalPeriodSimulation",
@@ -27,25 +45,17 @@ task runLoadTest(type: JavaExec) {
     ]
 }
 
-test {
-    systemProperties System.getProperties()
+// Tasks defined in dockercompose.gradle added in root script
 
-    def starwarsUrl;
-    if (!System.env.containsKey('starwars_planets_url') && !System.properties.containsKey('starwars_planets_url')) {
-        if (System.env.containsKey('DOCKER_HOST')) {
-            starwarsUrl = System.env.DOCKER_HOST.replace("tcp", "http").replace("2376", "9090") + "/starwars/"
-        } else {
-            starwarsUrl = "http://localhost:8080/starwars/"
-        }
-    }
-    systemProperties['starwars_planets_url'] = starwarsUrl
+if (project.hasProperty('env') && project.getProperty('env') == 'dev') {
+    runLoadTest.dependsOn startDockerCompose
+    runLoadTest.finalizedBy removeDockerCompose
+}
+
+test {
+
+
 }
 
 test.dependsOn runLoadTest
 
-// Tasks defined in dockercompose.gradle added in root script
-
-if (project.hasProperty('env') && project.getProperty('env') == 'dev') {
-    test.dependsOn startDockerCompose
-    test.finalizedBy removeDockerCompose
-}

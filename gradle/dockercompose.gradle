@@ -14,6 +14,7 @@ task startDockerCompose(type: ExecWait) {
     }
 
     // if planetsImage is null means that it is set as system property or environment variable
+    // and we don't need to touch the environment vars
     if (planetsImage != null) {
         def planetsImageEnv = [starwars_planets: planetsImage]
         environment planetsImageEnv
