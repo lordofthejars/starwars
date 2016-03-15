@@ -17,6 +17,14 @@ dependencyManagement {
     }
 }
 
+test {
+    if (project.hasProperty("happyPath")) {
+        filter {
+            includePatterns = ["org.starwars.PlanetServiceAPITest.shouldReturnTheAverage"]
+        }
+    }
+}
+
 dependencies {
     testCompile rootProject
 

@@ -9,7 +9,7 @@ def test(String project = null, String switches = null) {
     if (project == null) {
         run ':test', switches
     } else {
-        run ':' + project + ':test'
+        run ':' + project + ':test', switches
     }
 
 }
