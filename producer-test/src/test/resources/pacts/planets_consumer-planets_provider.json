@@ -1,0 +1,54 @@
+{
+    "provider": {
+        "name": "planets_provider"
+    },
+    "consumer": {
+        "name": "planets_consumer"
+    },
+    "interactions": [
+        {
+            "providerState": "planets aggregator",
+            "description": "Planets average calculation",
+            "request": {
+                "method": "GET",
+                "path": "/rest/planet/orbital/average"
+            },
+            "response": {
+                "status": 200,
+                "headers": {
+                    "Content-Type": "text/plain"
+                },
+                "body": "1298.3"
+            }
+        },
+        {
+            "providerState": "planets aggregator",
+            "description": "Planets with biggest orbital period",
+            "request": {
+                "method": "GET",
+                "path": "/rest/planet/orbital/biggest"
+            },
+            "response": {
+                "status": 200,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "planets": [
+                        "Bespin",
+                        "Yavin IV",
+                        "Hoth"
+                    ]
+                }
+            }
+        }
+    ],
+    "metadata": {
+        "pact-specification": {
+            "version": "2.0.0"
+        },
+        "pact-jvm": {
+            "version": "3.2.4"
+        }
+    }
+}

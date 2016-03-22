@@ -1,0 +1,27 @@
+apply plugin: 'java'
+
+dependencies {
+    compile 'au.com.dius:pact-jvm-provider-junit_2.11:3.2.4'
+}
+
+test {
+    testLogging {
+        showStandardStreams = true
+    }
+    systemProperties System.getProperties()
+
+    def starwarsUrl;
+    if (!System.env.containsKey('starwars_planets_url') && !System.properties.containsKey('starwars_planets_url')) {
+        if (System.env.containsKey('DOCKER_HOST')) {
+            starwarsUrl = System.env.DOCKER_HOST.replace("tcp", "http").replace("2376", "9090") + "/starwars/"
+        } else {
+            starwarsUrl = "http://localhost:8080/starwars/"
+        }
+    }
+    systemProperties['starwars_planets_url'] = starwarsUrl
+}
+
+if (project.hasProperty('env') && project.getProperty('env') == 'dev') {
+    test.dependsOn startDockerCompose
+    test.finalizedBy removeDockerCompose
+}
