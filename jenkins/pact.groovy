@@ -6,7 +6,7 @@ def withRequiredPacts(body) {
     }
 
     def workspace = pwd()
-    pactFolders = findFiles(glob: 'build/*')
+    pactFolders = findFiles(glob: 'build/**')
     echo "*** ${pactFolders.size()}"
     for(int i = 0; i < pactFolders.length; i++) {
         echo ">> ${pactFolders[i].directory} + ${pactFolders[i].path}"
