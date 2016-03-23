@@ -139,7 +139,7 @@ node {
             step([$class: 'JUnitResultArchiver', testResults: 'acceptance-test/build/test-results/*.xml'])
 
             gradle.test('stress-test')
-            publishHTML(target: [reportDir:'stress-test/build/reports/gatling-results/averageorbitalperiodsimulation-*', reportFiles: 'index.html', reportName: 'Gatling report'])
+            //publishHTML(target: [reportDir:'stress-test/build/reports/gatling-results/averageorbitalperiodsimulation-*', reportFiles: 'index.html', reportName: 'Gatling report'])
 
             //We need to get all pact files of consumers that has some connection with planets
             def pact = load('jenkins/pact.groovy')
