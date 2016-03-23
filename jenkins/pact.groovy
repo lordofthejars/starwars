@@ -4,14 +4,17 @@ def withRequiredPacts(body) {
         git 'file:///Users/alexsoto/git/starwars_pacts'
     }
 
-    def pacts = new File('build/starwars_pacts')
+    def workspace = pwd()
+    def pactDirectories = findFiles(glob: 'build/starwars_pacts/.+_planets_provider')
 
-    pacts.eachFileMatch(groovy.io.FileType.DIRECTORIES, ~/.+_planets_provider/) { pactDirectory ->
-        withEnv(["pacts=${pactDirectory.absolutePath}"]) {
-            println "Pact found at ${pactDirectory.path}"
+    for(int i = 0; i < pactDirectories.length; i++) {
+        def pactDirectory = "${workspace}/${pactDirectories[i].path}"
+        withEnv(["pacts=${pactDirectory}"]) {
+            println "Pact found at ${pactDirectories[i].path}"
             body.call
         }
     }
+
 }
 
 this
