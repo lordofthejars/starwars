@@ -3,11 +3,10 @@ def withRequiredPacts(body) {
     def pactFolders;
     dir('build') {
         git 'file:///Users/alexsoto/git/starwars_pacts'
-        pactFolders = findFiles()
     }
 
     def workspace = pwd()
-
+    pactFolders = findFiles(glob: 'build/*')
     echo "*** ${pactFolders.size()}"
     for(int i = 0; i < pactFolders.length; i++) {
         echo ">> ${pactFolders[i].directory} + ${pactFolders[i].path}"
