@@ -2,7 +2,7 @@ package org.starwars;
 
 import au.com.dius.pact.provider.junit.PactRunner;
 import au.com.dius.pact.provider.junit.Provider;
-import au.com.dius.pact.provider.junit.loader.PactFolder;
+import au.com.dius.pact.provider.junit.loader.PactSource;
 import au.com.dius.pact.provider.junit.target.Target;
 import au.com.dius.pact.provider.junit.target.TestTarget;
 import org.junit.BeforeClass;
@@ -14,7 +14,8 @@ import java.util.Optional;
 
 @RunWith(PactRunner.class)
 @Provider("planets_provider")
-@PactFolder("pacts")
+//env['pacts'] or prop['pacts'] or 'classpath:pacts'
+@PactSource(PactFolderSystemEnvLoader.class)
 public class PlanetProducerTest {
 
     private static URL location;
