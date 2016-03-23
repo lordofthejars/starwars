@@ -1,4 +1,4 @@
-stage 'compileAndUnit'
+stage 'Compile And Tests'
 
 def gradle;
 
@@ -28,13 +28,13 @@ node {
 
         // save coverage reports for being processed during code quality phase.
         stash includes: 'build/jacoco/*.exec', name: 'unitCodeCoverage'
-        stash includes: 'integration-commit-test/build/jacoco/*.exec', name: 'commitIntegrationCodeCoverage'
+        stash includes: 'integration-test/build/jacoco/*.exec', name: 'commitIntegrationCodeCoverage'
 
         // publish JUnit results to Jenkins
         step([$class: 'JUnitResultArchiver', testResults: '**/build/test-results/*.xml'])
 }
 
-stage 'codeQuality'
+stage 'Code Quality'
 
 node {
 
@@ -58,7 +58,9 @@ node {
       )
 }
 
-stage 'assemble-binaries'
+stage 'Integration Tests'
+
+stage 'Assemble Binaries'
 
 def dockerImages
 def starwarsImage
@@ -103,37 +105,48 @@ node {
 
     // runs container tests to be sure that the image is correctly created and it works
     withEnv(["starwars_planets=${planetsImageName}"]) {
-        gradle.test('container-test')
-        step([$class: 'JUnitResultArchiver', testResults: 'container-test/build/test-results/*.xml'])
+        //gradle.test('container-test')
+        //step([$class: 'JUnitResultArchiver', testResults: 'container-test/build/test-results/*.xml'])
     }
 
 }
 
 
-stage name: 'publish-binaries', concurrency: 1
+stage name: 'Publish Binaries', concurrency: 1
 
 node {
     unstash 'source'
-    gradle.publishApplication()
+    // Moves WAR to artifact repostitory
+    //gradle.publishApplication()
+
+    //Docker push
 }
 
 input message: "Deploy Application to Local"
 
 setCheckpoint('Before Deploying to Test')
 
-stage name: 'Deploy to Local', concurrency: 1
+stage name: 'Acceptance Stage in Local', concurrency: 1
 node {
     unstash 'source'
     withEnv(["starwars_planets=${planetsImageName}"]) {
         try {
             gradle.run('startDockerCompose')
-            gradle.test('acceptance-test')
-            gradle.run(':acceptance-test:aggregate')
-            publishHTML(target: [reportDir:'acceptance-test/target/site/serenity', reportFiles: 'index.html', reportName: 'SerenityBDD report'])
-            step([$class: 'JUnitResultArchiver', testResults: 'acceptance-test/build/test-results/*.xml'])
 
-            gradle.test('stress-test')
-            //publish gatling reports
+            //gradle.test('acceptance-test')
+            //gradle.run(':acceptance-test:aggregate')
+            //publishHTML(target: [reportDir:'acceptance-test/target/site/serenity', reportFiles: 'index.html', reportName: 'SerenityBDD report'])
+            //step([$class: 'JUnitResultArchiver', testResults: 'acceptance-test/build/test-results/*.xml'])
+
+            //gradle.test('stress-test')
+            //publishHTML(target: [reportDir:'stress-test/build/reports/gatling-results/averageorbitalperiodsimulation-*', reportFiles: 'index.html', reportName: 'Gatling report'])
+
+            //We need to get all pact files of consumers that has some connection with planets
+            def pact = load('jenkins/pact.groovy')
+            pact.withRequiredPacts {
+                gradle.test('producer-test')
+            }
+
         } finally {
             gradle.run('removeDockerCompose')
         }
