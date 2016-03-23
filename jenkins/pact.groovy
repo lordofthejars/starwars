@@ -5,14 +5,14 @@ def withRequiredPacts(body) {
     }
 
     def workspace = pwd()
-    echo "** ${workspace}"
-    def pactDirectories = findFiles(glob: 'build/*_planets_provider')
-    echo "** ${pactDirectories.size()}"
+    def pactDirectories = findFiles()
     for(int i = 0; i < pactDirectories.length; i++) {
-        def pactDirectory = "${workspace}/${pactDirectories[i].path}"
-        withEnv(["pacts=${pactDirectory}"]) {
-            println "Pact found at ${pactDirectories[i].path}"
-            body.call
+        if (pactDirectories[i].directory && pactDirectories[i].path.endsWith('_planets_provider')) {
+            def pactDirectory = "${workspace}/${pactDirectories[i].path}"
+            withEnv(["pacts=${pactDirectory}"]) {
+                println "Pact found at ${pactDirectories[i].path}"
+                body.call
+            }
         }
     }
 
