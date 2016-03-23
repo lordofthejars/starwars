@@ -19,8 +19,6 @@ apply plugin: 'maven-publish'
 
 // all projects need JaCoCo integration, compiling in Java 8 and similar group and version strategy
 allprojects {
-    apply plugin: 'jacoco'
-
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
 
@@ -31,10 +29,11 @@ allprojects {
         mavenCentral()
     }
 
-    jacoco {
-        toolVersion = "0.7.5.201505241946"
-    }
+}
 
+apply plugin: 'jacoco'
+jacoco {
+    toolVersion = "0.7.5.201505241946"
 }
 
 // there are dependencies that are common on core project (this) and all other subprojects like testing libraries
@@ -57,7 +56,7 @@ tasks.withType(JavaCompile) {
      options.encoding = 'UTF-8'
 }
 
-// aggregates jacoco resutls from all subprojects and core project and generate a report
+// aggregates jacoco results from all subprojects and core project and generate a report
 task jacocoRootTestReport(type: JacocoReport) {
 
     sourceSets sourceSets.main
