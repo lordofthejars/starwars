@@ -5,7 +5,7 @@ def withRequiredPacts(body) {
     }
 
     def workspace = pwd()
-    def pactFolders = findFiles(glob: 'build/**')
+    def pactFolders = findFiles(glob: 'build/*')
     for(int i = 0; i < pactFolders.length; i++) {
         echo ">> ${pactFolders[i].directory} + ${pactFolders[i].path}"
         if (pactFolders[i].directory && pactFolders[i].path.endsWith('_planets_provider/')) {
