@@ -105,8 +105,8 @@ node {
 
     // runs container tests to be sure that the image is correctly created and it works
     withEnv(["starwars_planets=${planetsImageName}"]) {
-        //gradle.test('container-test')
-        //step([$class: 'JUnitResultArchiver', testResults: 'container-test/build/test-results/*.xml'])
+        gradle.test('container-test')
+        step([$class: 'JUnitResultArchiver', testResults: 'container-test/build/test-results/*.xml'])
     }
 
 }
@@ -117,7 +117,7 @@ stage name: 'Publish Binaries', concurrency: 1
 node {
     unstash 'source'
     // Moves WAR to artifact repostitory
-    //gradle.publishApplication()
+    gradle.publishApplication()
 
     //Docker push
 }
@@ -133,22 +133,26 @@ node {
         try {
             gradle.run('startDockerCompose')
 
-            //gradle.test('acceptance-test')
-            //gradle.run(':acceptance-test:aggregate')
-            //publishHTML(target: [reportDir:'acceptance-test/target/site/serenity', reportFiles: 'index.html', reportName: 'SerenityBDD report'])
-            //step([$class: 'JUnitResultArchiver', testResults: 'acceptance-test/build/test-results/*.xml'])
+            gradle.test('acceptance-test')
+            gradle.run(':acceptance-test:aggregate')
+            publishHTML(target: [reportDir:'acceptance-test/target/site/serenity', reportFiles: 'index.html', reportName: 'SerenityBDD report'])
+            step([$class: 'JUnitResultArchiver', testResults: 'acceptance-test/build/test-results/*.xml'])
 
-            //gradle.test('stress-test')
-            //publishHTML(target: [reportDir:'stress-test/build/reports/gatling-results/averageorbitalperiodsimulation-*', reportFiles: 'index.html', reportName: 'Gatling report'])
+            gradle.test('stress-test')
+            publishHTML(target: [reportDir:'stress-test/build/reports/gatling-results/averageorbitalperiodsimulation-*', reportFiles: 'index.html', reportName: 'Gatling report'])
 
             //We need to get all pact files of consumers that has some connection with planets
             def pact = load('jenkins/pact.groovy')
-
             def pacts = pact.requiredPacts()
             pacts.each { pactDirectory ->
                 withEnv(["pacts=${pactDirectory}"]) {
                     println "Pact found at ${pactDirectory}"
-                    gradle.test('producer-test')
+                    try {
+                        gradle.test('producer-test')
+                    } catch (exception) {
+                        // Set build as failure but we don't stop the execution
+                        currentBuild.result = 'FAILURE'
+                    }
                 }
             }
 
