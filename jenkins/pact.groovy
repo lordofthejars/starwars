@@ -5,8 +5,9 @@ def withRequiredPacts(body) {
     }
 
     def workspace = pwd()
+    echo "** ${workspace}"
     def pactDirectories = findFiles(glob: 'build/.+_planets_provider')
-
+    echo "** ${pactDirectories.size()}"
     for(int i = 0; i < pactDirectories.length; i++) {
         def pactDirectory = "${workspace}/${pactDirectories[i].path}"
         withEnv(["pacts=${pactDirectory}"]) {
