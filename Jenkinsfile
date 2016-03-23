@@ -143,8 +143,13 @@ node {
 
             //We need to get all pact files of consumers that has some connection with planets
             def pact = load('jenkins/pact.groovy')
-            pact.withRequiredPacts {
-                gradle.test('producer-test')
+
+            def pacts = pact.requiredPacts()
+            pacts.each { pactDirectory ->
+                withEnv(["pacts=${pactDirectory}"]) {
+                    println "Pact found at ${pactDirectory}"
+                    gradle.test('producer-test')
+                }
             }
 
         } finally {

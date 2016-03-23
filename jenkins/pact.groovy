@@ -1,4 +1,4 @@
-def withRequiredPacts(body) {
+def requiredPacts() {
 
     def pactFolders;
     dir('build') {
@@ -7,18 +7,14 @@ def withRequiredPacts(body) {
     }
 
     def workspace = pwd()
-
+    def pacts = []
     for(int i = 0; i < pactFolders.length; i++) {
-        echo ">> ${pactFolders[i].directory} + ${pactFolders[i].path}"
         if (pactFolders[i].directory && pactFolders[i].path.endsWith('_planets_provider/')) {
             def pactDirectory = "${workspace}/build/${pactFolders[i].path}"
-            withEnv(["pacts=${pactDirectory}"]) {
-                println "Pact found at ${pactFolders[i].path}"
-                body.call
-            }
+            pacts << pactDirectory
         }
     }
-
+    return pacts
 }
 
 this
