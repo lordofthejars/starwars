@@ -18,5 +18,7 @@ class AverageOrbitalPeriodSimulation extends Simulation {
       .get("rest/planet/orbital/average"))
     .pause(1)
 
-  setUp(scn.inject(rampUsers(10).over(3 seconds))).protocols(conf)
+  setUp(scn.inject(rampUsers(10).over(3 seconds)))
+    .protocols(conf)
+    .assertions(global.successfulRequests.percent.is(100), global.responseTime.max.lessThan(3000))
 }
