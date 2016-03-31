@@ -5,7 +5,7 @@ def cleanAndCompile(String switches = null) {
     run 'clean compileJava', switches
 }
 
-def test(String project = null, String switches = null) {
+def test(String project = null, String switches = null  ) {
     if (project == null) {
         run ':test', switches
     } else {

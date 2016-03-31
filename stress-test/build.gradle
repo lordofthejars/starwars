@@ -26,7 +26,7 @@ task runLoadTest(type: JavaExec) {
 
     jvmArgs = [ "-Dgatling.core.directory.binaries=${sourceSets.test.output.classesDir.toString()}" ]
 
-    // Means that the url has been calculated here
+    // Means that the url has been calculated here and we set it
     if (starwarsUrl != null) {
         environment["starwars_planets_url"] = starwarsUrl
     }
@@ -57,5 +57,16 @@ test {
 
 }
 
+task(renameGatlingDirectory) << {
+    def report = {file -> file.isDirectory() && file.getName().startsWith('averageorbitalperiodsimulation')}
+    def reportDirectory = new File("${buildDir}/reports/gatling-results").listFiles().toList()
+    .findAll(report)
+    .sort()
+    .last()
+
+    reportDirectory.renameTo("${buildDir}/reports/gatling-results/averageorbitalperiodsimulation")
+}
+
+test.finalizedBy renameGatlingDirectory
 test.dependsOn runLoadTest
 
