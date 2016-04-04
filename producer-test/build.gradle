@@ -1,7 +1,7 @@
 apply plugin: 'java'
 
 dependencies {
-    compile 'au.com.dius:pact-jvm-provider-junit_2.11:3.2.4'
+    compile 'au.com.dius:pact-jvm-provider-junit_2.11:3.2.6'
 }
 
 test {

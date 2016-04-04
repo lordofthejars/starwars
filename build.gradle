@@ -5,11 +5,14 @@ buildscript {
     }
     dependencies {
         classpath 'com.bmuschko:gradle-docker-plugin:2.6.5'
+        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.3'
+        classpath 'org.asciidoctor:asciidoctorj-screenshot:0.1.0'
     }
 }
 
 plugins {
     id 'net.nemerosa.versioning' version '1.5.0'
+    id "de.undercouch.download" version "2.1.0"
 }
 
 apply plugin: 'war'
@@ -177,4 +180,37 @@ publishing {
             url repoUrl
         }
     }
+}
+
+apply plugin: 'org.asciidoctor.gradle.asciidoctor'
+
+asciidoctor {
+    sourceDir = file('src/asciidoc')
+    attributes = [
+            'screenshot-dir-name': "../screens",
+            'rootdir': "${rootDir}"
+    ]
+}
+
+task downloadFile(type: de.undercouch.gradle.tasks.download.Download) {
+    src 'https://github.com/sdaschner/jaxrs-analyzer/releases/download/v0.9/jaxrs-analyzer.jar'
+    dest buildDir
+}
+
+task runJaxRsAnalyzer(type:Exec) {
+    if (!new File("${buildDir}/jaxrs-analyzer.jar").exists()) {
+        dependsOn downloadFile
+    }
+    workingDir "${buildDir}"
+
+    def args = [
+            "-b",
+            "asciidoc",
+            "-o",
+            "${buildDir}/starwarsendpoints.adoc",
+            "${buildDir}/classes/main"
+    ]
+
+    commandLine "java -jar ${buildDir}/jaxrs-analyzer.jar -b asciidoc -o ${buildDir}/starwarsendpoints.adoc ${buildDir}/classes/main"
+
 }

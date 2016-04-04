@@ -1,0 +1,51 @@
+= Star Wars Planets Service
+Alex Soto
+v1.0
+:source-highlighter: highlightjs
+:example-caption!:
+:sourcedir: src/main/java
+:rootdir:
+:icons: font
+
+
+This service contains all the endpoints required by `Star Wars reporter` for getting all planets information of Star Wars world.
+
+== Information Required
+
+`Star Wars reporter` requires next information:
+
+ * The average orbital period of all the planets.
+ * The three planets with biggest orbital period.
+
+== Technical Details
+
+`Star Wars Planets` service gets raw data of planets from https://swapi.co/ site, and the napply the required calculations to be provided to its caller.
+
+.swapi.co
+****
+SWAPI means Star Wars API, and it is a public REST API to get all the information from all seven Star Wars films.
+
+The https://swapi.co site front page looks like:
+
+screenshot::https://swapi.co[name=swapi, frame=browser]
+The SWAPI landing page
+
+And you can see that there is a `Try Now` button that let's you play with the API before integrating with your service.
+****
+
+The integration with SWAPI is done using `JAX-RS` client.
+You can see the code used in next snippet:
+
+[source, java]
+.org.starwars.gateway.SwapiGateway.java
+----
+include::{rootdir}/{sourcedir}/org/starwars/gateway/SwapiGateway.java[tags=initial]
+----
+<1> Default location
+<2> Location can be overridden using a properties file
+<3> Creates the target location
+<4> Data is retrieved
+<5> `JsonObject` is created with the content.
+
+== REST Endpoints
+
