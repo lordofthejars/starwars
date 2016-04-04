@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import au.com.dius.pact.model.BodyMismatch;
 import au.com.dius.pact.model.BodyTypeMismatch;
 import au.com.dius.pact.model.HeaderMismatch;
+import au.com.dius.pact.model.OptionalBody;
 import au.com.dius.pact.model.RequestResponseInteraction;
 import au.com.dius.pact.model.Response;
 import au.com.dius.pact.model.ResponseMatching$;
@@ -93,7 +94,7 @@ public class UrlHttpTarget implements TestClassAwareTarget {
                 new Response(
                         ((Integer) actualResponse.get("statusCode")).intValue(),
                         (Map<String, String>) actualResponse.get("headers"),
-                        (String) actualResponse.get("data"))
+                        OptionalBody.body((String) actualResponse.get("data")))
         );
 
         if (!mismatches.isEmpty()) {
