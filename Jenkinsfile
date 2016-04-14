@@ -139,6 +139,7 @@ node {
             step([$class: 'JUnitResultArchiver', testResults: 'acceptance-test/build/test-results/*.xml'])
 
             gradle.test('stress-test')
+            // http://gatling.io/docs/2.2.0/whats_new/2.2.html#junit-format-report-file
             publishHTML(target: [reportDir:'stress-test/build/reports/gatling-results/averageorbitalperiodsimulation', reportFiles: 'index.html', reportName: 'Gatling report'])
 
             //We need to get all pact files of consumers that has some connection with planets
