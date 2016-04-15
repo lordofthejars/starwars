@@ -100,6 +100,7 @@ allprojects {
     apply from: "$rootDir/gradle/dockercompose.gradle"
 }
 
+// TODO https://plugins.gradle.org/plugin/com.github.ksoichiro.build.info
 // adds a build-info file inside war file
 task createBuildInfoFile << {
 
