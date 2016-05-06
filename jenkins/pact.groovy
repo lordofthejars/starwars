@@ -2,7 +2,7 @@ def requiredPacts() {
 
     def pactFolders;
     dir('build') {
-        git 'file:///Users/alexsoto/git/starwars_pacts'
+        git 'https://github.com/lordofthejars/starwars_pact.git'
         pactFolders = findFiles()
     }
 
