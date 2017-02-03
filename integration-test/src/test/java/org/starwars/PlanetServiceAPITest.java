@@ -46,7 +46,7 @@ public class PlanetServiceAPITest {
     URL url;
 
     @Rule
-    public WireMockRule wireMockRule = new WireMockRule(8089);
+    public WireMockRule wireMockRule = new WireMockRule(8888);
 
     @Before
     public void configureStub() throws IOException {

@@ -24,7 +24,7 @@ public class PlanetProducerTest {
     public static void setUpConnection() throws MalformedURLException {
         String url = Optional.ofNullable(System.getenv("starwars_planets_url"))
                 .orElse(Optional.ofNullable(System.getProperty("starwars_planets_url"))
-                .orElse("http://localhost:8080/starwars"));
+                .orElse("http://192.168.99.100:8080/starwars"));
         location = new URL(url);
     }
 

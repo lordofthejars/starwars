@@ -1,10 +1,28 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<arquillian>
-    <container qualifier="tomee" default="true">
+<?xml version="1.0"?>
+<arquillian xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns="http://jboss.org/schema/arquillian"
+            xsi:schemaLocation="http://jboss.org/schema/arquillian
+    http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
+
+    <extension qualifier="docker">
+        <property name="machineName">dev</property>
+        <property name="definitionFormat">CUBE</property>
+        <property name="dockerContainers">
+            tomee_dockerfile:
+              image: tomee:8-jdk-7.0.1-webprofile
+              env:
+                - JAVA_OPTS=-Djava.rmi.server.hostname=dockerServerIp
+                - CATALINA_OPTS=-Dtomee.serialization.class.whitelist= -Dtomee.remote.support=true -Dopenejb.system.apps=true -Dtomee.serialization.class.blacklist=org.codehaus.groovy.runtime.,org.apache.commons.collections.functors.,org.apache.xalan,java.lang.Process
+              portBindings: [8080->8080/tcp]
+        </property>
+    </extension>
+
+    <container qualifier="tomee_dockerfile" default="true">
         <configuration>
-            <property name="httpPort">-1</property>
-            <property name="stopPort">-1</property>
-            <property name="ajpPort">-1</property>
+            <property name="deployerProperties">
+                openejb.deployer.binaries.use=true
+                openejb.deployer.save-deployments=false
+            </property>
         </configuration>
     </container>
 </arquillian>

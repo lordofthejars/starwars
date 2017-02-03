@@ -5,7 +5,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath "io.spring.gradle:dependency-management-plugin:0.5.3.RELEASE"
+        classpath "io.spring.gradle:dependency-management-plugin:1.0.0.RELEASE"
     }
 }
 
@@ -13,8 +13,12 @@ apply plugin: "io.spring.dependency-management"
 
 dependencyManagement {
     imports {
-        mavenBom 'org.jboss.arquillian:arquillian-bom:1.1.10.Final'
+        mavenBom 'org.jboss.arquillian:arquillian-bom:1.1.12.Final'
     }
+}
+
+repositories {
+    mavenLocal()
 }
 
 apply plugin: 'jacoco'
@@ -32,10 +36,10 @@ test {
 
 dependencies {
     testCompile rootProject
-
+    testCompile 'org.arquillian.cube:arquillian-cube-docker:1.0.0.Final-SNAPSHOT'
     testCompile 'junit:junit:4.12'
     testCompile group: 'org.jboss.arquillian.junit', name: 'arquillian-junit-container'
-    testCompile 'org.apache.tomee:arquillian-tomee-remote:7.0.0-M1'
+    testCompile 'org.apache.tomee:arquillian-tomee-remote:7.0.2'
     testCompile 'com.jayway.restassured:rest-assured:2.8.0'
     testCompile 'com.github.tomakehurst:wiremock:1.57'
 }
